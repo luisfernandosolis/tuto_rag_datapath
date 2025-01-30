@@ -43,4 +43,28 @@ with st.sidebar:
     if load_button:
         vector_db = vectordb_from_file(pdf_file)
 
+        if vector_db:
+            print("vdb creado!")
+
+
+## show the chat
+chat_container = st.container()
+
+
+# the prompt input
+input_container = st.container()
+
+
+with input_container:
+    with st.form(key="my_form",clear_on_submit=True):
+        query = st.text_area("write a prompt!", key="input", height=80)
+        submit_button = st.form_submit_button(label="Submit")
+
+        if query and submit_button:
+            print(query)
+
+
+
+
+
 
