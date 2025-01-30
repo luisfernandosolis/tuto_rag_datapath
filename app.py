@@ -67,6 +67,10 @@ with st.sidebar:
             st.session_state["vector_db"] = vector_db
             st.session_state["answers"].append("Hi, how can I help you?")
             print("vdb creado!")
+    
+    if clear_button:
+        st.session_state["questions"]=[]
+        st.session_state["answers"] = ["Hi, how can I help you?"]
 
 
 ## show the chat
@@ -119,7 +123,7 @@ with input_container:
 
 
 with chat_container:
-    st.title("Talk with your pdf!")
+    st.title("Chat with your pdf!")
 
     question_messages = st.session_state["questions"]
     answer_messages = st.session_state["answers"]
