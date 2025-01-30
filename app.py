@@ -1,5 +1,36 @@
 import streamlit as st
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+## langchain modules
+from langchain.document_loaders import PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+
+def vectordb_from_file(pdf_file):
+
+    path_pdf_file = pdf_file.name
+
+    ##read the file
+    pdf_loader = PyPDFLoader(path_pdf_file)
+    documents = pdf_loader.load()
+
+    ## chunking file
+    splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=20)
+    chunks = splitter.split_documents(documents)
+
+    ## embedding chunks
+    embedding_model = OpenAIEmbeddings()
+
+    ## indexing in vdb
+    vector_db = FAISS.from_documents(chunks,embedding_model)
+
+    return vector_db
+
+
 
 with st.sidebar:
     st.title("RAG WITH STREAMLIT AND GROQ")
@@ -8,6 +39,8 @@ with st.sidebar:
 
     load_button = st.button(label="let's go!", type="primary")
     clear_button = st.button(label="clear chat", type="secondary")
-
+    
+    if load_button:
+        vector_db = vectordb_from_file(pdf_file)
 
 
