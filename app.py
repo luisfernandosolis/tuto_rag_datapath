@@ -65,6 +65,7 @@ with st.sidebar:
 
         if vector_db:
             st.session_state["vector_db"] = vector_db
+            st.session_state["answers"].append("Hi, how can I help you?")
             print("vdb creado!")
 
 
@@ -114,13 +115,23 @@ with input_container:
             st.session_state["questions"].append(query)
             st.session_state["answers"].append(answer)
 
-            st.write(st.session_state["questions"])
-            st.write(st.session_state["answers"])
              
 
 
 with chat_container:
     st.title("Talk with your pdf!")
+
+    question_messages = st.session_state["questions"]
+    answer_messages = st.session_state["answers"]
+
+    for i in range(len(answer_messages)):
+        message(answer_messages[i], key=str(i)+"_bot")
+        if i<len(question_messages):
+            message(question_messages[i], key=str(i)+"_user",is_user=True)
+
+
+
+
 
 
 
