@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_chat import message
 
 from dotenv import load_dotenv
 
@@ -9,6 +10,25 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
+from langchain.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
+from langchain.chains import RetrievalQA
+
+## save question and answers in session state memory
+
+if  "vector_db" not in st.session_state:
+    st.session_state["vector_db"]=None
+
+
+if  "questions" not in st.session_state:
+    st.session_state["questions"]=[]
+
+if "answers" not in st.session_state:
+    st.session_state["answers"] = []
+
+
+
+
 
 def vectordb_from_file(pdf_file):
 
@@ -44,6 +64,7 @@ with st.sidebar:
         vector_db = vectordb_from_file(pdf_file)
 
         if vector_db:
+            st.session_state["vector_db"] = vector_db
             print("vdb creado!")
 
 
@@ -63,6 +84,43 @@ with input_container:
         if query and submit_button:
             print(query)
 
+            vector_db = st.session_state["vector_db"]
+
+            ## prompt 
+            prompt = """
+                        You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
+                        Question: {question} 
+                        Context: {context} 
+                        Answer:
+            """
+            prompt_template = PromptTemplate(
+                template=prompt,
+                #input_variables=["question","context"]
+            )
+
+            llm_openai = ChatOpenAI(model="gpt-4")
+
+            retriever_db = vector_db.as_retriever()
+
+            retriever_qa = RetrievalQA.from_chain_type(
+                llm=llm_openai,
+                retriever=retriever_db,
+                chain_type="stuff"
+            )
+
+            answer = retriever_qa.run(query)
+
+            ## save in st memory
+            st.session_state["questions"].append(query)
+            st.session_state["answers"].append(answer)
+
+            st.write(st.session_state["questions"])
+            st.write(st.session_state["answers"])
+             
+
+
+with chat_container:
+    st.title("Talk with your pdf!")
 
 
 
