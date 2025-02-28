@@ -53,7 +53,7 @@ def vectordb_from_file(pdf_file):
 
 
 with st.sidebar:
-    st.title("RAG WITH STREAMLIT AND GROQ")
+    st.title("RAG WITH STREAMLIT AND frank en crack")
     
     pdf_file = st.file_uploader("uppload your file", type=["pdf"])
 
